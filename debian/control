@@ -1,10 +1,10 @@
 Source: nss-dns4only
 Section: admin
 Priority: extra
-Maintainer: Walter Doekes <wjdoekes+nss-dns4only@osso.nl>
+Maintainer: Kadek Suryadharma <kadeksuryadharma@kinsta.com>
 Build-Depends: debhelper (>=9)
 Standards-Version: 3.9.8
-Homepage: https://github.com/ossobv/nss-dnsonly
+Homepage: https://github.com/kadeksuryadharma/nss-dns4only
 
 Package: libnss-dns4only
 Architecture: any

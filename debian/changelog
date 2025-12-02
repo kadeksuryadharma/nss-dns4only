@@ -1,5 +1,6 @@
 nss-dns4only (0.1-1) stable; urgency=low
 
   * Initial release.
+  * Update package name
 
- -- Walter Doekes (work) <wjdoekes@osso.nl>  Mon, 27 Apr 2020 13:29:26 +0200
+ -- Kadek Suryadharma <kadeksuryadharma@kinsta.com>  Tue, 02 Dec 2025 21:25:48 +0800
