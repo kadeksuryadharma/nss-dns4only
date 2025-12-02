@@ -206,7 +206,7 @@ Debian packaging and download
 
 A pre-built debian package can be found here:
 
-https://download.osso.pub/deb/nss-dns4only/nss-dns4only_0.1-1/libnss-dns4only_0.1-1_amd64.deb
+https://github.com/kadeksuryadharma/nss-dns4only/releases/download/v1.0/libnss-dns4only.deb
 
 It should work on any Debian/Ubuntu with *glibc-2.9* or newer (amd64 only).
 
@@ -220,52 +220,20 @@ it in ``/lib/`` yourself::
         /etc/nsswitch.conf
 
 
-Technical background/history
-----------------------------
+How to build
+-----------------------------
+Make sure to install build packages essential
+```
+apt install build-essential debhelper-compat git nano wget devscripts
+```
+Clone the repo
+```
+git clone https://github.com/kadeksuryadharma/nss-dns4only
+```
+Build the DEBIAN package
+```
+cd nss-dns4only
+debuild -us -uc
+dpkg-deb --build debian/libnss-dns4only libnss-dns4only.deb
+```
 
-In 2008, in *glibc-2.9*, ``_nss_dns_gethostbyname4_r()`` was introduced, when
-*glibc* started doing *A+AAAA* lookups for ``getaddrinfo()`` for
-the unspecified *addresss family* (``AF_UNSPEC``)::
-
-    commit 1eb946b93509b94db2bddce741f2f3b483418a6d
-    Author: Ulrich Drepper <drepper@redhat.com>
-    Date:   Sat May 10 23:27:39 2008 +0000
-
-    ^-- adds _nss_dns_gethostbyname4_r:
-        nss-dns4only is useful since glibc-2.9+
-
-    commit d1fe1f22192f27425accde26c562f456d835e74a
-    Author: Ulrich Drepper <drepper@redhat.com>
-    Date:   Wed Sep 15 10:10:05 2004 +0000
-
-    ^-- adds _nss_dns_gethostbyname3_r:
-        nss-dns4only breaks before glibc-2.3.4+
-
-*glibc* transforms ``getaddrinfo()`` calls to calls to one or more of
-the Name Server Switch (NSS) functions. *nss-dns4only* inserts a
-``_nss_dns4only_gethostbyname4_r`` handler before the *glibc*
-``gethostbyname4_r()`` handler.
-
-When the *nss-dns4only* ``gethostbyname4_r()`` is called, it calls into *glibc*
-(``libnss_dns``) ``gethostbyname3_r()`` directly, selecting only the
-``AF_INET`` *address family.*
-
-The *glibc manual* has information about
-`Adding-another-Service-to-NSS`_ (version 2), about
-`Actions-in-the-NSS-configuration`_ (``[!UNAVAIL=return]``). More
-detailed info is in ``./resolv/nss_dns/dns-host.c`` and
-``./sysdeps/posix/getaddrinfo.c`` (see ``__nss_lookup_function``).
-
-*Sidenote: if your system uses libnss-resolve on localhost, you may
-already get IPv4 only responses. Note that that only works in
-conjunction with systemd-resolved. So, that's not practical for
-(Kubernetes) Docker containers.*
-
-
-/Walter Doekes, OSSO B.V. 2020
-
-.. _`Actions-in-the-NSS-configuration`: https://www.gnu.org/software/libc/manual/html_node/Actions-in-the-NSS-configuration.html#Actions-in-the-NSS-configuration
-.. _`Adding-another-Service-to-NSS`: https://www.gnu.org/software/libc/manual/html_node/Adding-another-Service-to-NSS.html#Adding-another-Service-to-NSS
-.. _`CoreDNS autopath+cache cause NXDOMAIN for A or AAAA records`: https://github.com/coredns/coredns/issues/3765
-.. _`CoreDNS fails to resolve A records under circumstances`: https://github.com/coredns/coredns/issues/2842
-.. _`Name Resolution Issue In CoreDNS`: https://www.linkedin.com/pulse/name-resolution-issue-coredns-inside-mind-problem-solver-spitzer/
